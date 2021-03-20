@@ -1,0 +1,35 @@
+- hosts: docker-engines
+  gather_facts: no
+  tasks:
+  - name: "Configuring yum Repository"
+    yum_repository:
+      description: "Docker"
+      name: "Docker"
+      file: "docker"
+      baseurl: "https://download.docker.com/linux/centos/7/x86_64/stable"
+      enabled: yes
+      gpgcheck: no
+    
+  - name: "Installing Docker-ce"
+    command: "yum install docker-ce --nobest -y"
+   
+  - name: "Starting Docker Services"
+    service:
+      name: "docker"
+      state: started
+      
+  - name: "Copying Files"
+    copy:
+      src: "Dockerfile"
+      dest: /root/
+      
+   - name: "Copying Files"
+    copy:
+      src: "index.html"
+      dest: /root/
+     
+   - name: "Building Docker Image from Dockerfile"
+     command: "docker build /root/ -t httpd:v1"
+     
+   - name: "Launching container from the the above created image"
+     command: "docker run -it -p 8080:80 httpd:v1"
